@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.YouwanluxianCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.youwanluxian_id as youwanluxianId
+        ,a.yonghu_id as yonghuId
+        ,a.youwanluxian_collection_types as youwanluxianCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.YouwanluxianCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,youwanluxian.youwanluxian_name as youwanluxianName
+        ,youwanluxian.youwanluxian_uuid_number as youwanluxianUuidNumber
+        ,youwanluxian.youwanluxian_photo as youwanluxianPhoto
+        ,youwanluxian.youwanluxian_lvyoufangshi_types as youwanluxianLvyoufangshiTypes
+        ,youwanluxian.youwanluxian_chufashijian_types as youwanluxianChufashijianTypes
+        ,youwanluxian.youwanluxian_xingcheng_number as youwanluxianXingchengNumber
+        ,youwanluxian.youwanluxian_chuxingfangshi_types as youwanluxianChuxingfangshiTypes
+        ,youwanluxian.youwanluxian_clicknum as youwanluxianClicknum
+        ,youwanluxian.youwanluxian_content as youwanluxianContent
+        ,youwanluxian.youwanluxian_delete as youwanluxianDelete
+
+        FROM youwanluxian_collection  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN youwanluxian youwanluxian ON a.youwanluxian_id = youwanluxian.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.youwanluxianId != null and params.youwanluxianId != ''">
+                and (
+                    a.youwanluxian_id = #{params.youwanluxianId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.youwanluxianCollectionTypes != null and params.youwanluxianCollectionTypes != ''">
+                and a.youwanluxian_collection_types = #{params.youwanluxianCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+                <!-- 判断游玩路线的id不为空 -->
+            <if test=" params.youwanluxianIdNotNull != '' and params.youwanluxianIdNotNull != null and params.youwanluxianIdNotNull != 'null' ">
+                and a.youwanluxian_id IS NOT NULL
+            </if>
+            <if test=" params.youwanluxianName != '' and params.youwanluxianName != null and params.youwanluxianName != 'null' ">
+                and youwanluxian.youwanluxian_name like CONCAT('%',#{params.youwanluxianName},'%')
+            </if>
+            <if test=" params.youwanluxianUuidNumber != '' and params.youwanluxianUuidNumber != null and params.youwanluxianUuidNumber != 'null' ">
+                and youwanluxian.youwanluxian_uuid_number like CONCAT('%',#{params.youwanluxianUuidNumber},'%')
+            </if>
+            <if test="params.youwanluxianLvyoufangshiTypes != null  and params.youwanluxianLvyoufangshiTypes != ''">
+                and youwanluxian.youwanluxian_lvyoufangshi_types = #{params.youwanluxianLvyoufangshiTypes}
+            </if>
+
+            <if test="params.youwanluxianChufashijianTypes != null  and params.youwanluxianChufashijianTypes != ''">
+                and youwanluxian.youwanluxian_chufashijian_types = #{params.youwanluxianChufashijianTypes}
+            </if>
+
+            <if test="params.youwanluxianXingchengNumberStart != null  and params.youwanluxianXingchengNumberStart != '' ">
+                <![CDATA[  and youwanluxian.youwanluxian_xingcheng_number >= #{params.youwanluxianXingchengNumberStart}   ]]>
+            </if>
+            <if test="params.youwanluxianXingchengNumberEnd != null  and params.youwanluxianXingchengNumberEnd != '' ">
+                <![CDATA[  and youwanluxian.youwanluxian_xingcheng_number <= #{params.youwanluxianXingchengNumberEnd}   ]]>
+            </if>
+            <if test="params.youwanluxianXingchengNumber != null  and params.youwanluxianXingchengNumber != '' ">
+                and youwanluxian.youwanluxian_xingcheng_number = #{params.youwanluxianXingchengNumber}
+            </if>
+            <if test="params.youwanluxianChuxingfangshiTypes != null  and params.youwanluxianChuxingfangshiTypes != ''">
+                and youwanluxian.youwanluxian_chuxingfangshi_types = #{params.youwanluxianChuxingfangshiTypes}
+            </if>
+
+            <if test="params.youwanluxianClicknumStart != null  and params.youwanluxianClicknumStart != '' ">
+                <![CDATA[  and youwanluxian.youwanluxian_clicknum >= #{params.youwanluxianClicknumStart}   ]]>
+            </if>
+            <if test="params.youwanluxianClicknumEnd != null  and params.youwanluxianClicknumEnd != '' ">
+                <![CDATA[  and youwanluxian.youwanluxian_clicknum <= #{params.youwanluxianClicknumEnd}   ]]>
+            </if>
+            <if test="params.youwanluxianClicknum != null  and params.youwanluxianClicknum != '' ">
+                and youwanluxian.youwanluxian_clicknum = #{params.youwanluxianClicknum}
+            </if>
+            <if test=" params.youwanluxianContent != '' and params.youwanluxianContent != null and params.youwanluxianContent != 'null' ">
+                and youwanluxian.youwanluxian_content like CONCAT('%',#{params.youwanluxianContent},'%')
+            </if>
+            <if test="params.youwanluxianDeleteStart != null  and params.youwanluxianDeleteStart != '' ">
+                <![CDATA[  and youwanluxian.youwanluxian_delete >= #{params.youwanluxianDeleteStart}   ]]>
+            </if>
+            <if test="params.youwanluxianDeleteEnd != null  and params.youwanluxianDeleteEnd != '' ">
+                <![CDATA[  and youwanluxian.youwanluxian_delete <= #{params.youwanluxianDeleteEnd}   ]]>
+            </if>
+            <if test="params.youwanluxianDelete != null  and params.youwanluxianDelete != '' ">
+                and youwanluxian.youwanluxian_delete = #{params.youwanluxianDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
