@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LvyoutuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.lvyoutuan_name as lvyoutuanName
+        ,a.lvyoutuan_uuid_number as lvyoutuanUuidNumber
+        ,a.lvyoutuan_photo as lvyoutuanPhoto
+        ,a.lvyoutuan_lvxingdizhi as lvyoutuanLvxingdizhi
+        ,a.youwanluxian_chuxingfangshi_types as youwanluxianChuxingfangshiTypes
+        ,a.lvyoutuan_types as lvyoutuanTypes
+        ,a.lvyoutuan_number as lvyoutuanNumber
+        ,a.lvyoutuan_clicknum as lvyoutuanClicknum
+        ,a.lvyoutuan_content as lvyoutuanContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.lvyoutuan_delete as lvyoutuanDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LvyoutuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+
+        FROM lvyoutuan  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.lvyoutuanName != '' and params.lvyoutuanName != null and params.lvyoutuanName != 'null' ">
+                and a.lvyoutuan_name like CONCAT('%',#{params.lvyoutuanName},'%')
+            </if>
+            <if test=" params.lvyoutuanUuidNumber != '' and params.lvyoutuanUuidNumber != null and params.lvyoutuanUuidNumber != 'null' ">
+                and a.lvyoutuan_uuid_number like CONCAT('%',#{params.lvyoutuanUuidNumber},'%')
+            </if>
+            <if test=" params.lvyoutuanLvxingdizhi != '' and params.lvyoutuanLvxingdizhi != null and params.lvyoutuanLvxingdizhi != 'null' ">
+                and a.lvyoutuan_lvxingdizhi like CONCAT('%',#{params.lvyoutuanLvxingdizhi},'%')
+            </if>
+            <if test="params.youwanluxianChuxingfangshiTypes != null and params.youwanluxianChuxingfangshiTypes != ''">
+                and a.youwanluxian_chuxingfangshi_types = #{params.youwanluxianChuxingfangshiTypes}
+            </if>
+            <if test="params.lvyoutuanTypes != null and params.lvyoutuanTypes != ''">
+                and a.lvyoutuan_types = #{params.lvyoutuanTypes}
+            </if>
+            <if test="params.lvyoutuanNumberStart != null and params.lvyoutuanNumberStart != ''">
+                <![CDATA[  and a.lvyoutuan_number >= #{params.lvyoutuanNumberStart}   ]]>
+            </if>
+            <if test="params.lvyoutuanNumberEnd != null and params.lvyoutuanNumberEnd != ''">
+                <![CDATA[  and a.lvyoutuan_number <= #{params.lvyoutuanNumberEnd}   ]]>
+            </if>
+             <if test="params.lvyoutuanNumber != null and params.lvyoutuanNumber != ''">
+                and a.lvyoutuan_number = #{params.lvyoutuanNumber}
+             </if>
+            <if test="params.lvyoutuanClicknumStart != null and params.lvyoutuanClicknumStart != ''">
+                <![CDATA[  and a.lvyoutuan_clicknum >= #{params.lvyoutuanClicknumStart}   ]]>
+            </if>
+            <if test="params.lvyoutuanClicknumEnd != null and params.lvyoutuanClicknumEnd != ''">
+                <![CDATA[  and a.lvyoutuan_clicknum <= #{params.lvyoutuanClicknumEnd}   ]]>
+            </if>
+             <if test="params.lvyoutuanClicknum != null and params.lvyoutuanClicknum != ''">
+                and a.lvyoutuan_clicknum = #{params.lvyoutuanClicknum}
+             </if>
+            <if test=" params.lvyoutuanContent != '' and params.lvyoutuanContent != null and params.lvyoutuanContent != 'null' ">
+                and a.lvyoutuan_content like CONCAT('%',#{params.lvyoutuanContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.lvyoutuanDeleteStart != null and params.lvyoutuanDeleteStart != ''">
+                <![CDATA[  and a.lvyoutuan_delete >= #{params.lvyoutuanDeleteStart}   ]]>
+            </if>
+            <if test="params.lvyoutuanDeleteEnd != null and params.lvyoutuanDeleteEnd != ''">
+                <![CDATA[  and a.lvyoutuan_delete <= #{params.lvyoutuanDeleteEnd}   ]]>
+            </if>
+             <if test="params.lvyoutuanDelete != null and params.lvyoutuanDelete != ''">
+                and a.lvyoutuan_delete = #{params.lvyoutuanDelete}
+             </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
